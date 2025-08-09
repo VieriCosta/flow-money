@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ interface DashboardData {
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [data, setData] = useState<DashboardData>({
     totalBalance: 0,
     monthlyExpenses: 0,
@@ -140,7 +141,7 @@ export default function Dashboard() {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" onClick={() => navigate('/settings')}>
               <Settings className="h-4 w-4 mr-2" />
               Configurações
             </Button>
@@ -327,19 +328,19 @@ export default function Dashboard() {
               <CardDescription>Acesso direto às principais funcionalidades</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full justify-start" variant="outline">
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/new-transaction')}>
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Nova Transação
               </Button>
-              <Button className="w-full justify-start" variant="outline">
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/new-goal')}>
                 <Target className="h-4 w-4 mr-2" />
                 Criar Meta
               </Button>
-              <Button className="w-full justify-start" variant="outline">
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/reports')}>
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Ver Relatórios
               </Button>
-              <Button className="w-full justify-start" variant="outline">
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/simulator')}>
                 <Settings className="h-4 w-4 mr-2" />
                 Simulador
               </Button>
