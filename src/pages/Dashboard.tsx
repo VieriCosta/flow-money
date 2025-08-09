@@ -69,16 +69,18 @@ export default function Dashboard() {
         .order('date', { ascending: false })
         .limit(5);
 
-      // Calculate monthly expenses
-      const currentMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
+      // Calculate monthly expenses for current month
+      const now = new Date();
+      const currentMonth = now.getMonth() + 1; // getMonth() returns 0-11, we need 1-12
+      const currentYear = now.getFullYear();
       
       const { data: monthlyTransactions } = await supabase
         .from('transactions')
         .select('amount, type')
         .eq('user_id', user.id)
         .eq('type', 'expense')
-        .gte('date', `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`);
+        .gte('date', `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`)
+        .lt('date', `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`);
 
       const monthlyExpenses = monthlyTransactions?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
 
@@ -157,12 +159,19 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">Olá! 👋</h2>
-          <p className="text-muted-foreground">Aqui está um resumo das suas finanças</p>
+          <p className="text-muted-foreground">
+            Aqui está um resumo das suas finanças - {new Date().toLocaleDateString('pt-BR', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </p>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+          <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => navigate('/reports')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Saldo Total</CardTitle>
               <DollarSign className="h-4 w-4 text-success" />
@@ -172,12 +181,12 @@ export default function Dashboard() {
                 R$ {data.totalBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                +2.1% em relação ao mês passado
+                Clique para ver detalhes
               </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => navigate('/reports')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Gastos do Mês</CardTitle>
               <TrendingDown className="h-4 w-4 text-destructive" />
@@ -187,12 +196,12 @@ export default function Dashboard() {
                 R$ {data.monthlyExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
               </div>
               <p className="text-xs text-muted-foreground">
-                -5.2% em relação ao mês passado
+                {new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
               </p>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => navigate('/new-goal')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Progresso das Metas</CardTitle>
               <Target className="h-4 w-4 text-info" />
@@ -202,7 +211,7 @@ export default function Dashboard() {
                 {data.goalsProgress.toFixed(1)}%
               </div>
               <p className="text-xs text-muted-foreground">
-                3 metas ativas
+                Clique para gerenciar metas
               </p>
             </CardContent>
           </Card>
