@@ -1,73 +1,49 @@
-# Welcome to your Lovable project
+# flow-money
 
-## Project info
+## Sobre o projeto
 
-**URL**: https://lovable.dev/projects/dd3b9761-fa4e-4ba8-a709-f8bacc271951
+flow-money é um aplicativo de finanças pessoais onde você pode registrar seus gastos, ganhos e projetar investimentos futuros, ajudando a ter um melhor controle financeiro e planejamento.
 
-## How can I edit this code?
+## Tecnologias utilizadas
 
-There are several ways of editing your application.
+Este projeto foi construído com:
 
-**Use Lovable**
+- Vite  
+- TypeScript  
+- React  
+- shadcn-ui  
+- Tailwind CSS  
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/dd3b9761-fa4e-4ba8-a709-f8bacc271951) and start prompting.
+## Como editar este projeto
 
-Changes made via Lovable will be committed automatically to this repo.
+Você pode editar este projeto localmente usando sua IDE preferida.  
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Passos para rodar localmente:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clonar o repositório (substitua pela URL do seu repositório)
+git clone <SEU_REPOSITORIO_GIT>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Entrar na pasta do projeto
+cd flow-money
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Instalar as dependências
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Iniciar o servidor de desenvolvimento
 npm run dev
-```
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Como fazer o deploy
+O deploy pode ser feito usando sua plataforma de hospedagem favorita (Vercel, Netlify, etc) configurando o projeto para rodar a build gerada pelo Vite.
 
-**Use GitHub Codespaces**
+Estrutura do projeto
+src/ - código-fonte da aplicação
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+src/pages/ - páginas da aplicação
 
-## What technologies are used for this project?
+src/components/ - componentes reutilizáveis
 
-This project is built with:
+src/integrations/supabase/ - integração com Supabase para backend e banco de dados
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/dd3b9761-fa4e-4ba8-a709-f8bacc271951) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+supabase/ - configuração do banco de dados e migrações
