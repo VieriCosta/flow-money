@@ -106,6 +106,8 @@ export default function Dashboard() {
         .gte('date', `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`)
         .lt('date', `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`);
 
+      console.log('Expense transactions:', expenseTransactions);
+
       // Group expenses by category
       const categoryMap = new Map();
       expenseTransactions?.forEach(transaction => {
@@ -127,7 +129,16 @@ export default function Dashboard() {
         }
       });
 
-      const expensesByCategory = Array.from(categoryMap.values());
+      let expensesByCategory = Array.from(categoryMap.values());
+      
+      // Se não houver dados, mostrar categorias padrão com valor 0
+      if (expensesByCategory.length === 0) {
+        expensesByCategory = [
+          { name: 'Nenhum gasto registrado', value: 0, color: '#9CA3AF' }
+        ];
+      }
+
+      console.log('Expenses by category:', expensesByCategory);
 
       // Calculate balance history for last 4 months
       const balanceHistory = [];
