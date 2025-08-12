@@ -299,35 +299,45 @@ export default function Dashboard() {
               <CardDescription>Distribuição dos gastos do mês atual</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie
-                    data={data.expensesByCategory}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {data.expensesByCategory.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+              {data.expensesByCategory.length > 0 && data.expensesByCategory[0].value > 0 ? (
+                <>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={data.expensesByCategory}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {data.expensesByCategory.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value) => `R$ ${Number(value).toLocaleString('pt-BR')}`} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {data.expensesByCategory.map((category, index) => (
+                      <Badge key={index} variant="outline" className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: category.color }}
+                        />
+                        {category.name}: R$ {Number(category.value).toLocaleString('pt-BR')}
+                      </Badge>
                     ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => `R$ ${Number(value).toLocaleString('pt-BR')}`} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="flex flex-wrap gap-2 mt-4">
-                {data.expensesByCategory.map((category, index) => (
-                  <Badge key={index} variant="outline" className="flex items-center gap-2">
-                    <div 
-                      className="w-3 h-3 rounded-full" 
-                      style={{ backgroundColor: category.color }}
-                    />
-                    {category.name}
-                  </Badge>
-                ))}
-              </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
+                  <BarChart3 className="h-12 w-12 mb-4" />
+                  <p>Nenhum gasto registrado neste mês</p>
+                  <p className="text-sm">Adicione transações de despesa para ver o gráfico</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -488,9 +498,9 @@ export default function Dashboard() {
                 <Target className="h-4 w-4 mr-2" />
                 Criar Meta
               </Button>
-              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/reports')}>
+              <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/transactions')}>
                 <BarChart3 className="h-4 w-4 mr-2" />
-                Ver Relatórios
+                Ver Todas as Transações
               </Button>
               <Button className="w-full justify-start" variant="outline" onClick={() => navigate('/simulator')}>
                 <Settings className="h-4 w-4 mr-2" />
