@@ -39,13 +39,15 @@ export default function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
+
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, [user]);
 
   const fetchDashboardData = async () => {
     try {
