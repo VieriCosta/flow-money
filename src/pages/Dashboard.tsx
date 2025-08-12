@@ -17,10 +17,20 @@ import {
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
 
+interface Goal {
+  id: string;
+  name: string;
+  target_amount: number;
+  current_amount: number;
+  target_date?: string;
+  monthly_contribution: number;
+}
+
 interface DashboardData {
   totalBalance: number;
   monthlyExpenses: number;
   goalsProgress: number;
+  goals: Goal[];
   recentTransactions: any[];
   expensesByCategory: any[];
   balanceHistory: any[];
@@ -33,6 +43,7 @@ export default function Dashboard() {
     totalBalance: 0,
     monthlyExpenses: 0,
     goalsProgress: 0,
+    goals: [],
     recentTransactions: [],
     expensesByCategory: [],
     balanceHistory: []
@@ -86,7 +97,7 @@ export default function Dashboard() {
 
       const monthlyExpenses = monthlyTransactions?.reduce((sum, t) => sum + Number(t.amount), 0) || 0;
 
-      // Fetch goals
+      // Fetch goals with more details
       const { data: goals } = await supabase
         .from('goals')
         .select('*')
@@ -174,6 +185,7 @@ export default function Dashboard() {
         totalBalance,
         monthlyExpenses,
         goalsProgress,
+        goals: goals || [],
         recentTransactions: transactions || [],
         expensesByCategory,
         balanceHistory
@@ -343,6 +355,76 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Goals Section */}
+        {data.goals.length > 0 && (
+          <div className="mb-8">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Suas Metas</CardTitle>
+                  <CardDescription>Acompanhe o progresso das suas metas financeiras</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => navigate('/new-goal')}>
+                  <Target className="h-4 w-4 mr-2" />
+                  Ver Todas
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {data.goals.slice(0, 4).map((goal) => {
+                    const progressPercentage = (Number(goal.current_amount) / Number(goal.target_amount)) * 100;
+                    const daysToTarget = goal.target_date ? 
+                      Math.ceil((new Date(goal.target_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
+                    
+                    return (
+                      <div key={goal.id} className="p-4 border rounded-lg space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">{goal.name}</h4>
+                          <Badge variant={progressPercentage >= 100 ? "default" : "secondary"}>
+                            {progressPercentage.toFixed(1)}%
+                          </Badge>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Progresso</span>
+                            <span>
+                              R$ {Number(goal.current_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} / 
+                              R$ {Number(goal.target_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2">
+                            <div 
+                              className="bg-primary h-2 rounded-full transition-all duration-300" 
+                              style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                          <span>
+                            Contribuição: R$ {Number(goal.monthly_contribution).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês
+                          </span>
+                          {daysToTarget && daysToTarget > 0 && (
+                            <span>{daysToTarget} dias restantes</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {data.goals.length > 4 && (
+                  <div className="mt-4 text-center">
+                    <Button variant="outline" onClick={() => navigate('/new-goal')}>
+                      Ver mais {data.goals.length - 4} meta(s)
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Recent Transactions & Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
