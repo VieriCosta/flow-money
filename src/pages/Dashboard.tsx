@@ -71,7 +71,7 @@ export default function Dashboard() {
 
       // Calculate monthly expenses for current month
       const now = new Date();
-      const currentMonth = now.getMonth() + 1; // getMonth() returns 0-11, we need 1-12
+      const currentMonth = now.getMonth() + 1;
       const currentYear = now.getFullYear();
       
       const { data: monthlyTransactions } = await supabase
@@ -94,20 +94,68 @@ export default function Dashboard() {
         ? goals.reduce((sum, goal) => sum + (Number(goal.current_amount) / Number(goal.target_amount)), 0) / goals.length * 100
         : 0;
 
-      // Mock data for charts
-      const expensesByCategory = [
-        { name: 'Alimentação', value: 800, color: '#EF4444' },
-        { name: 'Transporte', value: 400, color: '#F97316' },
-        { name: 'Lazer', value: 300, color: '#8B5CF6' },
-        { name: 'Outros', value: 200, color: '#6B7280' }
-      ];
+      // Fetch expenses by category from actual transactions
+      const { data: expenseTransactions } = await supabase
+        .from('transactions')
+        .select(`
+          amount,
+          categories (name, color)
+        `)
+        .eq('user_id', user.id)
+        .eq('type', 'expense')
+        .gte('date', `${currentYear}-${String(currentMonth).padStart(2, '0')}-01`)
+        .lt('date', `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-01`);
 
-      const balanceHistory = [
-        { month: 'Jan', balance: 2000 },
-        { month: 'Fev', balance: 2200 },
-        { month: 'Mar', balance: 2800 },
-        { month: 'Abr', balance: totalBalance }
-      ];
+      // Group expenses by category
+      const categoryMap = new Map();
+      expenseTransactions?.forEach(transaction => {
+        const categoryName = transaction.categories?.name || 'Outros';
+        const categoryColor = transaction.categories?.color || '#6B7280';
+        const amount = Number(transaction.amount);
+        
+        if (categoryMap.has(categoryName)) {
+          categoryMap.set(categoryName, {
+            ...categoryMap.get(categoryName),
+            value: categoryMap.get(categoryName).value + amount
+          });
+        } else {
+          categoryMap.set(categoryName, {
+            name: categoryName,
+            value: amount,
+            color: categoryColor
+          });
+        }
+      });
+
+      const expensesByCategory = Array.from(categoryMap.values());
+
+      // Calculate balance history for last 4 months
+      const balanceHistory = [];
+      for (let i = 3; i >= 0; i--) {
+        const date = new Date(currentYear, currentMonth - 1 - i, 1);
+        const monthStr = date.toLocaleDateString('pt-BR', { month: 'short' });
+        
+        // Get transactions up to this month
+        const { data: historyTransactions } = await supabase
+          .from('transactions')
+          .select('amount, type')
+          .eq('user_id', user.id)
+          .lte('date', date.toISOString().split('T')[0]);
+
+        let balance = 0;
+        historyTransactions?.forEach(transaction => {
+          if (transaction.type === 'income') {
+            balance += Number(transaction.amount);
+          } else {
+            balance -= Number(transaction.amount);
+          }
+        });
+
+        balanceHistory.push({
+          month: monthStr,
+          balance: balance
+        });
+      }
 
       setData({
         totalBalance,
